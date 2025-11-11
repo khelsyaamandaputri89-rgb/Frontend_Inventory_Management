@@ -43,11 +43,11 @@ const Sidebar = () => {
     try {
       let result 
       if (role === "user") {
-        result = await productsServices.searchProduct()
+        result = await productsServices.searchProduct(value)
         setResult({products : result.data})
       } else {
-        result = await searchServices.searchAll()
-        setResult(result.data)
+        result = await searchServices.searchAll(value)
+        setResult(result.data.result)
       }
     } catch (error) {
       console.error("Search error:", error.response?.data || error)
@@ -56,7 +56,7 @@ const Sidebar = () => {
   }
 
   const handleSelect = (type) => {
-    setSearch()
+    setSearch("")
     setResult({
       products: [],
       categories: [],
@@ -74,7 +74,7 @@ const Sidebar = () => {
         navigate("/orders")
         break
       case "users" : 
-        navigate(`/users/${item.id}`)
+        navigate("/users")
         break
       default :
         break
@@ -124,7 +124,7 @@ const Sidebar = () => {
           placeholder="Search..."
           value={search}
           onChange={(e) => handleSearch(e.target.value)}
-          className="w-full p-2 pl-9 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-red-900"
+          className="w-full p-2 pl-9 rounded-md border text-sm focus:outline-none focus:ring-0 focus:ring-red-900"
         />
 
         {search && (
