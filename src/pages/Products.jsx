@@ -36,6 +36,7 @@ const Product = () => {
     } catch (error) {
         console.error("[fetchDataProducts] error:", error)
         toast.error("Failed to load products")
+        setProducts([])
     } finally {
         setLoading(false)
     }
@@ -136,6 +137,11 @@ const Product = () => {
         if (!orderQuantity || orderQuantity <= 0) {
           return toast.error("Enter a valid amount!")
         }
+
+        if (orderQuantity > selectedProduct.stock) {
+          return toast.error("Quantity exceeds stock!");
+        }
+
         const payload = {
           items :[
             {
@@ -165,7 +171,12 @@ const Product = () => {
         </div>
         <h1 className="text-2xl font-bold mb-5 mt-8">Products</h1>
       </div>
-      {loading && <p>Loading...</p>}
+
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-white/70 z-50">
+          <p className="text-lg font-semibold text-gray-700">Loading...</p>
+        </div>
+      )}
 
       <Table
         title="Products"
@@ -222,6 +233,7 @@ const Product = () => {
               <input
                 type="number"
                 min="1"
+                max={selectedProduct?.stock}
                 value={orderQuantity}
                 onChange={(e) => setOrderQuantity(e.target.value)}
                 className="border border-gray-300 p-2 w-full rounded mb-4"

@@ -8,6 +8,7 @@ const getStockSales = (data) => api.get("/reports/stock-sales", data)
 const searchReportProduct = (keyword) => api.get("/reports/products/search", { params: { search: keyword }})
 const searchReportOrder = (keyword) => api.get("/reports/orders/search", { params: { search: keyword }})
 const searchReportStock = (keyword) => api.get("/reports/stocks/search", { params: { search: keyword }})
+const getMonthlySales = () => api.get("/reports/monthly-sales")
 
 export default {
     getProductReport, 
@@ -17,5 +18,6 @@ export default {
     getStockSales, 
     searchReportProduct,
     searchReportOrder,
-    searchReportStock
+    searchReportStock,
+    getMonthlySales
 }

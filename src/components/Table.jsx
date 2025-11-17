@@ -1,8 +1,8 @@
-import React from "react"
+import React, { useMemo, useState } from "react"
 import { FiEdit2 } from "react-icons/fi"
 import { FaRegTrashCan } from "react-icons/fa6"
 import { IoSearchOutline } from "react-icons/io5"
-
+import { MdNavigateBefore, MdNavigateNext } from "react-icons/md"
 const Table = ({
   columns = [],
   data = [],
@@ -11,8 +11,24 @@ const Table = ({
   onDelete,
   onSearch,
   onOrder,
-  isUser = false
+  isUser = false,
+  itemsPerPage = 5
 }) => {
+
+  const [page, setPage] = useState(1)
+
+  const totalPages = Math.ceil(data.length / itemsPerPage)
+
+  const totalData = useMemo(() => {
+    const start = (page - 1) * itemsPerPage
+    const end = start + itemsPerPage
+    return data.slice(start, end)
+  }, [data, page, itemsPerPage])
+
+  const handlePage = (page) => {
+    if (page >= 1 && page <= totalPages) setPage(page)
+  }
+
   return (
     <div className="bg-white rounded-2xl shadow-md ml-64">
       <div className="p-6">
@@ -22,7 +38,10 @@ const Table = ({
               <input
                 type="text"
                 placeholder="Search..."
-                onChange={(e) => onSearch?.(e.target.value)}
+                onChange={(e) => {
+                  onSearch?.(e.target.value) 
+                  setPage(1)
+                }}
                 className="border px-3 py-2 pl-9 rounded-md w-full focus:ring-2 focus:ring-red-800 outline-none"
               />
             </div>
@@ -58,13 +77,13 @@ const Table = ({
                   </thead>
 
                   <tbody>
-                    {Array.isArray(data) && data.length > 0 ? (
-                      data.map((row, i) => (
+                    {Array.isArray(totalData) && totalData.length > 0 ? (
+                      totalData.map((row, i) => (
                         <tr key={i} className="border-b hover:bg-gray-50">
                           {columns.map((col, j) => (
                             <td key={j} className="px-4 py-3 whitespace-nowrap">
                               {col.render
-                                ? col.render(row[col.accessor])
+                                ? col.render(row[col.accessor], row)
                                 : typeof row[col.accessor] === "object"
                                 ? JSON.stringify(row[col.accessor])
                                 : row[col.accessor]}
@@ -117,6 +136,27 @@ const Table = ({
                 </table>
               </div>
             </div>
+          </div>
+          <div className="flex items-center justify-center gap-4 mt-4">
+            <button
+              disabled={page === 1}
+              onClick={() => setPage(page - 1)}
+              className="p-2 text-gray-400 hover:text-gray-600 cursor-pointer disabled:bg-gray-50 disabled:cursor-not-allowed"
+            >
+              <MdNavigateBefore size={20} />
+            </button>
+
+            <span className="text-sm">
+              Page {page} of {totalPages}
+            </span>
+
+            <button
+              disabled={page === totalPages}
+              onClick={() => setPage(page + 1)}
+              className="p-2 text-gray-400 hover:text-gray-600 cursor-pointer disabled:bg-gray-50 disabled:cursor-not-allowed"
+            >
+              <MdNavigateNext size={20} />
+            </button>
           </div>
         </div>
       </div>

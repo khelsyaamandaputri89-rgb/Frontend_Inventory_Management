@@ -94,8 +94,8 @@ const Dashboard = () => {
                                     color="text-indigo-600"
                                 />
                                 <CardMetric
-                                    title="Total Stock"
-                                    value={dashboardData.stock}
+                                    title="Total Product"
+                                    value={dashboardData.totalProducts}
                                     color="text-green-600"
                                 />
                                 <CardMetric

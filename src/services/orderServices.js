@@ -6,5 +6,6 @@ const getAllOrder = () => api.get("/orders")
 const getOrder = () => api.get("/orders/my-orders")
 const deleteOrder = (id) => api.delete(`/orders/${id}`)
 const searchOrder = (keyword) => api.get("/orders/search", { params: { search: keyword }})
+const updateOrdersStatus = (id, status) => api.put(`/orders/${id}/status`, { status })
 
-export default { addOrder, createOrder, getOrder, getAllOrder, deleteOrder, searchOrder }
+export default { addOrder, createOrder, getOrder, getAllOrder, deleteOrder, searchOrder, updateOrdersStatus}

@@ -131,16 +131,21 @@ const Stock = () => {
                 </div>
                 <h1 className="text-2xl font-bold mb-5 mt-8">Stocks</h1>
             </div>
-            {loading && <p>Loading...</p>}
+
+            {loading && (
+                <div className="fixed inset-0 flex items-center justify-center bg-white/70 z-50">
+                    <p className="text-lg font-semibold text-gray-700">Loading...</p>
+                </div>
+            )}
 
             <Table
                 title="Stocks"
                 columns={[
                     { header: "ID", accessor: "id" },
                     { header: "Product", accessor: "product" },
-                    { header: "Change Type", accessor: "change_type" },
-                    { header: "Quantity", accessor: "quantity" },
-                    { header: "Stock Akhir", accessor: "stock_akhir" },
+                    // { header: "Change Type", accessor: "change_type" },
+                    // { header: "Quantity", accessor: "quantity" },
+                    { header: "Stock Available", accessor: "stock_akhir" },
                     { header: "Created At", accessor: "createdAt" }
                 ]}
                 data={stock}

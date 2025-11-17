@@ -45,10 +45,21 @@ const Categories = () => {
   }
 
   const handleSubmit = async () => {
+    if (!formData.name || formData.name.trim() === "") {
+      toast.error("Category name must be filled in!")
+      return
+    }
     try {
       console.log("[handleSubmit] formData:", formData, "isEdit:", isEditMode);
       if (isEditMode) {
-        if (!formData.id) throw new Error("Missing categories id for update")
+        if (!formData.id) {
+          toast.error("Missing categories id for update")
+          return
+        }
+        if (!formData.name || formData.name.trim() === "") {
+          toast.error("Category name cannot be empty when editing!")
+          return
+        }
         await categoriesServices.updatecategories(formData.id, formData)
         toast.success("Categories updated")
       } else {
@@ -112,7 +123,12 @@ const Categories = () => {
         </div>
         <h1 className="text-2xl font-bold mb-5 mt-8">Categories</h1>
       </div>
-      {loading && <p>Loading...</p>}
+      
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-white/70 z-50">
+          <p className="text-lg font-semibold text-gray-700">Loading...</p>
+        </div>
+      )}
 
       <Table
         title="Catgories"

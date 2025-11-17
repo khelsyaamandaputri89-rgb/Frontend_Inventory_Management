@@ -118,7 +118,12 @@ const User = () => {
                     </div>
                     <h1 className="text-2xl font-bold mb-5 mt-8">Users</h1>
                 </div>
-                {loading && <p>Loading...</p>}
+
+                {loading && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-white/70 z-50">
+                        <p className="text-lg font-semibold text-gray-700">Loading...</p>
+                    </div>
+                )}
 
                 <Table
                     title="Users"

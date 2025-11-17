@@ -7,6 +7,8 @@ import Select from 'react-select'
 import CardMetric from "../components/CardMetric"
 import Chart from "../components/Chart"
 import axios from "axios"
+import productsService from "../services/productsServices"
+import LineChartReport from "../components/ChartLine"
 
 const Report = () => {
     const [report, setReport] = useState({ value: "product", label: "Product Report" })
@@ -14,6 +16,7 @@ const Report = () => {
     const [search, setSearch] = useState("")
     const [loading, setLoading] = useState(false)
     const [chartData, setChartData] = useState([])
+    const [lowStockCount, setLowStockCount] = useState(0)
     const [summaryData, setSummaryData] = useState({
         totalSales : 0,
         totalStock : 0,
@@ -56,6 +59,7 @@ const Report = () => {
         try {
             const result = await reportServices.getSummary()
             setSummaryData(result.data)
+            console.log("Summary data:", result.data)
         } catch (error) {
             console.error(error)
             toast.error("Failed to load summary")
@@ -75,7 +79,7 @@ const Report = () => {
     const handleExport = async (type) => {
         try {
             const token = localStorage.getItem("token")
-            const url = `${import.meta.env.VITE_SERVICE_URL}/reports/${report.value}?exportType=${type}`
+            const url = `${import.meta.env.VITE_SERVICE_URL}/api/reports/${report.value}?exportType=${type}`
 
             const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` },
@@ -138,6 +142,29 @@ const Report = () => {
         fetchStockSales()
     }, [report])
 
+    useEffect(() => {
+        const fetchProducts = async () => {
+        try {
+            const res = await productsService.getProduct()
+            console.log("Products data:", res.data)
+
+            const products = 
+                Array.isArray(res.data) ? res.data :
+                Array.isArray(res.data.data) ? res.data.data :
+                Array.isArray(res.data.products) ? res.data.products :
+                []
+
+            const lowStock = products.filter((p) => p.stock < 100)
+            setLowStockCount(lowStock.length)
+        } catch (error) {
+            console.error(error)
+            toast.error("Failed to fetch products")
+        }
+        }
+
+        fetchProducts()
+    }, [])
+
     const columns = {
         product: [
             { header: "ID", accessor: "id" },
@@ -173,6 +200,12 @@ const Report = () => {
                 Reports
             </h1>
 
+            {loading && (
+                <div className="fixed inset-0 flex items-center justify-center bg-white/70 z-50">
+                    <p className="text-lg font-semibold text-gray-700">Loading...</p>
+                </div>
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-6 mb-8 ml-64">
                 <CardMetric 
                     title="Total Sales"
@@ -190,9 +223,15 @@ const Report = () => {
                     value={summaryData.totalSold ?? 0}
                     color="text-green-600" 
                 />
+                <CardMetric 
+                    title="Low Stock Items"
+                    value={lowStockCount}
+                    color="text-green-600" 
+                />
             </div>
 
-            <div className="grid grid-cols-1 gap-6 ml-64 mb-8">
+            <div className='ml-64 bg-white flex flex-wrap justify-between gap-8 pl-0 py-4'>
+                <div className='w-full lg:w-[48%]'>
                 <Chart 
                 data={chartData}
                 title= "Stock & Sold"
@@ -200,6 +239,10 @@ const Report = () => {
                 name= "sold"
                 time= "Last month"
                 />
+                </div>
+                <div className='w-full lg:w-[48%]'>
+                <LineChartReport />
+                </div>
             </div>
 
             <div className="flex gap-4 items-center ml-64 mt-10 mb-10">
@@ -245,7 +288,7 @@ const Report = () => {
                 <button
                     onClick={() => handleExport("excel")}
                     disabled={loading}
-                    className="flex items-center bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+                    className="flex items-center bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg"
                 >
                     <FiDownload className="mr-2" /> Export Excel
                 </button>
@@ -253,7 +296,7 @@ const Report = () => {
                 <button
                     onClick={() => handleExport("pdf")}
                     disabled={loading}
-                    className="flex items-center bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
+                    className="flex items-center bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-lg"
                 >
                     <FiDownload className="mr-2" /> Export PDF
                 </button>
